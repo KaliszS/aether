@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+bytemuck = { version = "1.25.2", features = ["derive"] }
+glam = "0.34.1"
 log = "0.4.34"
 web-sys = { version = "0.3.106", features = ["HtmlCanvasElement"] }
 wgpu = { version = "30.0.1", features = ["webgl"] }

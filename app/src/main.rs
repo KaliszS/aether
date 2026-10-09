@@ -1,5 +1,9 @@
 mod app;
+mod canvas_size;
 mod components;
+mod demo;
+mod frame_loop;
+mod input;
 mod render_loop;
 
 fn main() {
