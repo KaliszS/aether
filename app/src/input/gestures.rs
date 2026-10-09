@@ -1,8 +1,4 @@
-#[derive(Clone, Copy, Debug)]
-pub struct Point {
-    pub x: f64,
-    pub y: f64,
-}
+use crate::web::view_rect::Point;
 
 /// What the user did, in CSS pixels, independent of the input device.
 #[derive(Debug)]
