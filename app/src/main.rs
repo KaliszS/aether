@@ -1,10 +1,9 @@
 mod app;
-mod canvas_size;
-mod components;
-mod demo;
-mod frame_loop;
 mod input;
-mod render_loop;
+mod scenes;
+mod ui;
+mod view;
+mod web;
 
 fn main() {
     console_error_panic_hook::set_once();

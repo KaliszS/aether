@@ -50,6 +50,7 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "engine",
+ "js-sys",
  "leptos",
  "log",
  "wasm-bindgen",

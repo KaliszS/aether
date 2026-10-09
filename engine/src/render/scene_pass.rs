@@ -5,7 +5,11 @@ const SHADER: &str = concat!(
     include_str!("shaders/scene.wgsl"),
     include_str!("shaders/noise.wgsl"),
     include_str!("shaders/sky.wgsl"),
+    include_str!("shaders/sphere.wgsl"),
     include_str!("shaders/star.wgsl"),
+    include_str!("shaders/planet.wgsl"),
+    include_str!("shaders/orbit.wgsl"),
+    include_str!("shaders/bodies.wgsl"),
 );
 
 /// Ray-traces the whole scene in a single fullscreen pass.

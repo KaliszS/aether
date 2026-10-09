@@ -4,6 +4,9 @@
   --border: #1c2130;
   --text: #e6e9f2;
   --muted: #8a92a8;
+  --accent: #7aa2ff;
+  --accent-soft: rgba(122, 162, 255, 0.15);
+  --hover: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -25,9 +28,18 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+}
+
 .sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 280px;
   flex-shrink: 0;
+  overflow-y: auto;
   padding: 24px 20px;
   background: var(--panel);
   border-right: 1px solid var(--border);
@@ -44,9 +56,219 @@ body {
   font-size: 14px;
 }
 
+.section-title {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.body-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  list-style: none;
+}
+
+.body-row {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.body-row:hover {
+  background: var(--hover);
+}
+
+.body-row.focused {
+  background: var(--accent-soft);
+}
+
+.body-name {
+  flex: 1;
+  padding: 7px 10px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.compare-toggle {
+  width: 26px;
+  height: 26px;
+  margin-right: 4px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.compare-toggle:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.compare-toggle.picked {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.primary-button {
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: default;
+}
+
+.hint {
+  min-height: 1em;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 100%);
+  height: min(640px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 0 20px;
+}
+
+.modal-header h2 {
+  font-size: 16px;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--hover);
+}
+
+.modal-caption {
+  padding: 4px 20px 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.modal-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.modal-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
 .viewport {
+  position: relative;
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Zero-size anchor at the body's screen position; children are placed around it. */
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 12px system-ui, sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.label-ring {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(160, 190, 255, 0.6);
+  border-radius: 50%;
+  transition: opacity 0.2s;
+}
+
+.label-name {
+  position: absolute;
+  left: 0;
+  top: -8px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: rgba(230, 233, 242, 0.8);
+  text-shadow: 0 0 4px #000;
+}
+
+.label:hover .label-ring {
+  border-color: #fff;
+}
+
+.label:hover .label-name {
+  color: #fff;
 }
 
 .viewport canvas {
@@ -67,8 +289,27 @@ body {
   }
   .sidebar {
     width: auto;
+    gap: 8px;
     padding: 12px 16px;
     border-right: none;
     border-bottom: 1px solid var(--border);
+  }
+  .tagline,
+  .section-title,
+  .hint {
+    display: none;
+  }
+  .body-list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .body-row {
+    flex-shrink: 0;
+  }
+  .body-name {
+    padding: 6px 8px;
+  }
+  .modal-backdrop {
+    padding: 8px;
   }
 }

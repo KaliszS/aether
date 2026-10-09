@@ -1,12 +1,9 @@
+const STAR_POINT_COLOR = vec3<f32>(1.0, 0.9, 0.75);
+
 fn rotate_y(p: vec3<f32>, angle: f32) -> vec3<f32> {
     let c = cos(angle);
     let s = sin(angle);
     return vec3<f32>(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
-}
-
-// Point on the ray nearest to the center, relative to the center.
-fn closest_approach(rd: vec3<f32>, center: vec3<f32>) -> vec3<f32> {
-    return rd * max(dot(center, rd), 0.0) - center;
 }
 
 fn star_surface(n: vec3<f32>, rd: vec3<f32>) -> vec3<f32> {
@@ -29,26 +26,10 @@ fn corona(offset: vec3<f32>, r: f32) -> vec3<f32> {
     return vec3<f32>(1.0, 0.55, 0.25) * (inner * 1.5 + outer);
 }
 
-fn star_glow(rd: vec3<f32>, body: vec4<f32>) -> vec3<f32> {
-    let offset = closest_approach(rd, body.xyz) / body.w;
-    return corona(offset, length(offset));
-}
-
-fn star_hit(rd: vec3<f32>, body: vec4<f32>, pixel: f32) -> Hit {
-    let center = body.xyz;
-    let radius = body.w;
-    let along = dot(center, rd);
-    let h = along * along - dot(center, center) + radius * radius;
-    if (along <= 0.0 || h <= 0.0) {
-        return no_hit();
-    }
-    let t = along - sqrt(h);
-    if (t <= 0.0) {
-        return no_hit();
-    }
-    let r = length(closest_approach(rd, center)) / radius;
-    let edge_width = pixel * length(center) / radius;
-    let coverage = clamp((1.0 - r) / edge_width + 0.5, 0.0, 1.0);
-    let n = (rd * t - center) / radius;
-    return Hit(t, star_surface(n, rd), coverage);
+fn star_glow(rd: vec3<f32>, body: Body, s: SphereView, pixel: f32) -> vec3<f32> {
+    // Point on the ray nearest to the center, relative to the center.
+    let offset = rd * max(dot(body.center, rd), 0.0) - body.center;
+    let halo = point_glow(s, pixel, STAR_POINT_COLOR * 0.4, 6.0);
+    let core = point_glow(s, pixel, STAR_POINT_COLOR * 6.0, 1.5);
+    return corona(offset / body.radius, length(offset) / body.radius) + halo + core;
 }

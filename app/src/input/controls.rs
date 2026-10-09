@@ -1,29 +1,10 @@
-use engine::{DVec2, OrbitCamera};
+use engine::OrbitCamera;
 
-use super::gestures::{Gesture, Point};
+use super::gestures::Gesture;
+use crate::web::view_rect::{Point, ViewRect};
 
 const ORBIT_RADIANS_PER_PIXEL: f64 = 0.006;
 const ZOOM_PER_WHEEL_PIXEL: f64 = 0.0015;
-
-/// Canvas position on the page, in CSS pixels.
-pub struct ViewRect {
-    pub left: f64,
-    pub top: f64,
-    pub width: f64,
-    pub height: f64,
-}
-
-impl ViewRect {
-    fn shorter_side(&self) -> f64 {
-        self.width.min(self.height).max(1.0)
-    }
-
-    /// Same convention as the shader: center is 0, shorter side spans -1..1, y down.
-    fn to_view(&self, p: Point) -> DVec2 {
-        let center = DVec2::new(self.left + self.width / 2.0, self.top + self.height / 2.0);
-        (DVec2::new(p.x, p.y) - center) / self.shorter_side() * 2.0
-    }
-}
 
 /// Pans move the scene with the pointer; zooms keep the point under the pointer fixed.
 pub fn apply(camera: &mut OrbitCamera, gesture: Gesture, view: &ViewRect) {

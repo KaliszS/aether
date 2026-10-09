@@ -1,3 +1,18 @@
+const KIND_STAR: u32 = 0u;
+const KIND_PLANET: u32 = 1u;
+
+// All positions are relative to the camera, which sits at the origin.
+struct Body {
+    center: vec3<f32>,
+    radius: f32,
+    base_color: vec3<f32>,
+    kind: u32,
+    accent_color: vec3<f32>,
+    banding: f32,
+    orbit_center: vec3<f32>,
+    orbit_radius: f32,
+};
+
 struct Frame {
     right: vec3<f32>,
     tan_half_fov: f32,
@@ -5,10 +20,11 @@ struct Frame {
     time: f32,
     forward: vec3<f32>,
     body_count: u32,
+    light: vec3<f32>,
+    has_light: u32,
     resolution: vec2<f32>,
     _pad: vec2<f32>,
-    // xyz: center relative to the camera, w: radius.
-    bodies: array<vec4<f32>, 16>,
+    bodies: array<Body, 16>,
 };
 
 @group(0) @binding(0) var<uniform> frame: Frame;
@@ -59,8 +75,9 @@ fn fs_main(@builtin(position) frag: vec4<f32>) -> @location(0) vec4<f32> {
     var hit = no_hit();
     for (var i = 0u; i < frame.body_count; i++) {
         let body = frame.bodies[i];
-        background += star_glow(rd, body);
-        hit = nearer(hit, star_hit(rd, body, pixel));
+        let view = view_sphere(rd, body.center, body.radius);
+        background += orbit_line(rd, body, pixel) + body_glow(rd, body, view, pixel);
+        hit = nearer(hit, body_hit(rd, body, view, pixel));
     }
 
     return vec4<f32>(tone_map(mix(background, hit.color, hit.coverage)), 1.0);
