@@ -1,0 +1,8 @@
+[workspace]
+resolver = "3"
+members = ["engine", "app"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
