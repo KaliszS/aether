@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  TRUNK_VERSION: v0.21.14
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the toolchain and wasm target pinned in rust-toolchain.toml.
+      - name: Install Rust
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install Trunk
+        run: |
+          curl -sSL "https://github.com/trunk-rs/trunk/releases/download/${TRUNK_VERSION}/trunk-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C /usr/local/bin
+
+      - name: Build
+        working-directory: app
+        run: trunk build --release --public-url "/${{ github.event.repository.name }}/"
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: app/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
